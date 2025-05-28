@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Movie</title>
+    <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f9ff;
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #004aad;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fefefe;
+      color: #333;
+      transition: border 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+
+ 
+  <form id="movieForm">
+    <label for="movieName">Movie Name</label>
+    <input type="text" id="movieName" name="movieName" required />
+
+    <label for="duration">Duration (minutes)</label>
+    <input type="number" id="duration" name="duration" required />
+
+    <label for="releaseYear">Release Year</label>
+    <input type="number" id="releaseYear" name="releaseYear" required />
+
+    <label for="genre">Genre</label>
+    <input type="text" id="genre" name="genre" required />
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="4" required></textarea>
+
+    <label for="director">Director</label>
+    <input type="text" id="director" name="director" required />
+
+    <label for="photo">Movie Image</label>
+    <input type="file" id="photo" name="photo" accept="image/*" />
+
+    <button type="submit">Upload Movie</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("movieForm");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+
+      // Get token from localStorage or set it manually for testing
+      const authToken = localStorage.getItem("token") || "YOUR_HARDCODED_TOKEN_HERE";
+
+      try {
+        const res = await fetch("https://movie-listing-app-au97.onrender.com/addMovie", {
+          method: "POST",
+          headers: {
+            "Authorization": authToken // not Bearer
+          },
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Movie uploaded successfully!");
+          form.reset();
+        } else {
+          alert("Upload failed: " + (data.message || "Unknown error"));
+        }
+      } catch (err) {
+        //alert("Error: " + err.message);
+      }
+    });
+  </script>
+
+</body>
+</html>

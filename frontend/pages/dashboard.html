@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - 2 Columns of Movie Rows</title>
+  <style>body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f4ff;
+  margin: 0;
+  padding: 0;
+  color: #1a237e; /* dark blue text */
+}
+
+nav {
+  background-color: #1a237e; /* dark blue */
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(26, 35, 126, 0.7);
+}
+
+nav h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-buttons button {
+  padding: 10px 20px;
+  background-color: #3f51b5; /* medium blue */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nav-buttons button:hover {
+  background-color: #283593; /* darker blue */
+}
+
+#moviesContainer {
+  max-width: 1000px;
+  margin: 30px auto 50px auto;
+  padding: 20px 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(63, 81, 181, 0.15);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+/* Each movie column container with 2 movies stacked vertically */
+.movie-column {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Each movie row - image + details side by side */
+.movie-row {
+  display: flex;
+  gap: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #d0dfff;
+  align-items: center;
+  height: 345px; /* match image height */
+}
+
+.movie-row img {
+  width: 240px;      /* increased width by 50% */
+  height: 345px;     /* adjusted height proportionally */
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(63, 81, 181, 0.25);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.movie-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  color: #283593;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.movie-details h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a237e;
+}
+
+.movie-details p {
+  margin: 0;
+  line-height: 1.3;
+}
+
+@media (max-width: 900px) {
+  #moviesContainer {
+    grid-template-columns: 1fr; /* single column on smaller screens */
+    padding: 20px;
+  }
+  .movie-column {
+    gap: 40px;
+  }
+  .movie-row {
+    flex-direction: column;
+    height: auto;
+  }
+  .movie-row img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+  .movie-details {
+    font-size: 14px;
+  }
+  .nav-buttons button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  nav h2 {
+    font-size: 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+  <nav>
+    <h2>Movie Dashboard</h2>
+    <div class="nav-buttons">
+      <button id="uploadBtn">Upload Movie</button>
+      <button id="myMoviesBtn">My Movies</button>
+    </div>
+  </nav>
+
+  <div id="moviesContainer">Loading movies...</div>
+
+  <script>
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    async function fetchMovies() {
+      try {
+        const res = await fetch("https://movie-listing-app-au97.onrender.com/allMovies", {
+          headers: {
+            "Authorization": token
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error("Unauthorized or error fetching movies");
+        }
+
+        const data = await res.json();
+        const movies = Array.isArray(data) ? data : (data.message || []);
+
+        const container = document.getElementById("moviesContainer");
+        container.innerHTML = "";
+
+        if (!movies || movies.length === 0) {
+          container.innerHTML = "<p>No movies found.</p>";
+          return;
+        }
+
+        // Show first 6 movies in 2 columns
+        movies.slice(0, 6).forEach(movie => {
+          const row = document.createElement("div");
+          row.className = "movie-row";
+
+          row.innerHTML = `
+            <img src="${movie.Image || 'https://via.placeholder.com/160x230?text=No+Image'}" alt="Movie Poster" />
+            <div class="movie-info">
+              <h3>${movie.movieName}</h3>
+              <p><strong>Director:</strong> ${movie.director}</p>
+              <p><strong>Genre:</strong> ${movie.genre || 'N/A'}</p>
+              <p><strong>Year:</strong> ${movie.releaseYear || 'N/A'}</p>
+              <p><strong>Duration:</strong> ${movie.duration || 'N/A'} mins</p>
+            </div>
+          `;
+
+          container.appendChild(row);
+        });
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+        const container = document.getElementById("moviesContainer");
+        container.innerHTML = "<p>Session expired or unauthorized. Please log in again.</p>";
+        setTimeout(() => {
+          localStorage.removeItem("token");
+          window.location.href = "login.html";
+        }, 2000);
+      }
+    }
+
+    document.getElementById("uploadBtn").addEventListener("click", () => {
+      window.location.href = "addMovie.html";
+    });
+
+    document.getElementById("myMoviesBtn").addEventListener("click", () => {
+      window.location.href = "myMovies.html";
+    });
+
+    fetchMovies();
+  </script>
+
+</body>
+</html>

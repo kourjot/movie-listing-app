@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <style>
+    :root {
+      --teal: #00b894;
+      --teal-dark: #019875;
+      --blue: #0984e3;
+      --blue-dark: #0767c5;
+      --bg-light: #c2e9fb;
+      --bg-alt: #a1e3d8;
+      --white: #ffffff;
+      --gray: #333;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, var(--bg-light), var(--bg-alt));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--gray);
+    }
+
+    form {
+      background: var(--white);
+      padding: 30px 25px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 400px;
+      transition: transform 0.3s ease;
+    }
+
+    form:hover {
+      transform: scale(1.01);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 26px;
+      color: var(--teal);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      font-size: 16px;
+      transition: border 0.3s ease, box-shadow 0.3s;
+    }
+
+    input:focus {
+      border-color: var(--teal);
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 184, 148, 0.4);
+    }
+
+    button {
+      background-color: var(--teal);
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--teal-dark);
+    }
+
+    #message {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+      color: red;
+    }
+
+    .signup-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .signup-link p {
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .signup-link button {
+      background-color: var(--blue);
+      transition: background-color 0.3s ease;
+    }
+
+    .signup-link button:hover {
+      background-color: var(--blue-dark);
+    }
+
+    @media (max-width: 500px) {
+      form {
+        padding: 20px;
+        width: 90%;
+      }
+
+      input,
+      button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <form id="loginForm" autocomplete="on">
+    <h2>Login</h2>
+    <input type="email" id="email" name="email" placeholder="Email" required />
+    <input type="password" id="password" name="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+    <div id="message"></div>
+    <div class="signup-link">
+      <p>Don't have an account?</p>
+      <button type="button" id="signUpBtn">Sign Up</button>
+    </div>
+  </form>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const messageDiv = document.getElementById("message");
+    const signUpBtn = document.getElementById("signUpBtn");
+
+    // Redirect to Sign-Up page
+    signUpBtn.addEventListener("click", () => {
+      window.location.href = "../signIn.html"; // Adjust path as needed
+    });
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      messageDiv.textContent = "";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("https://movie-listing-app-au97.onrender.com/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const result = await res.json();
+
+        if (res.status === 200) {
+          localStorage.setItem("token", result.token);
+          window.location.href = "dashboard.html";
+        } else {
+          messageDiv.textContent = result.message || "Login failed.";
+        }
+      } catch (err) {
+        console.error(err);
+        messageDiv.textContent = "Server error. Please try again.";
+      }
+    });
+  </script>
+
+</body>
+</html>

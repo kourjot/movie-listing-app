@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up</title>
+  <style>
+ /* Reset and box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body styling with soft gradient */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #c2e9fb, #a1e3d8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* Form container */
+form {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+  transition: transform 0.3s ease-in-out;
+}
+
+form:hover {
+  transform: scale(1.01);
+}
+
+/* Heading */
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 24px;
+  font-size: 26px;
+}
+
+/* Input fields */
+input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 12px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  display: block;
+}
+
+input:focus {
+  outline: none;
+  border-color: #00b894;
+  box-shadow: 0 0 5px rgba(0, 184, 148, 0.4);
+}
+
+/* Submit button */
+button {
+  background: #00b894;
+  color: #ffffff;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background: #019875;
+  transform: translateY(-2px);
+}
+
+/* Message text */
+#message {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 500;
+  color: red;
+}
+
+/* Login section */
+#loginSection {
+  margin-top: 20px;
+  text-align: center;
+  color: #2c3e50;
+}
+
+#loginSection p {
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* Login button */
+#loginSection button {
+  background-color: #0984e3;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#loginSection button:hover {
+  background-color: #0767c5;
+  transform: translateY(-2px);
+}
+
+/* Responsive design */
+@media (max-width: 500px) {
+  form {
+    padding: 20px;
+    width: 90%;
+  }
+
+  input,
+  button {
+    font-size: 14px;
+  }
+}
+
+
+</style>
+
+</head>
+<body>
+
+  <form id="signUpForm" autocomplete="on">
+    <h2>Create Account</h2>
+    <input type="text" id="username" name="username" placeholder="Username" autocomplete="username" required />
+    <input type="email" id="email" name="email" placeholder="Email" autocomplete="email" required />
+    <input type="password" id="password" name="password" placeholder="Password (special char)" autocomplete="new-password" required />
+    <button type="submit">Sign Up</button>
+    <div id="message"></div>
+  </form>
+
+  <div id="loginSection">
+    <p>Already have an account?</p>
+    <button id="loginBtn" type="button">Go to Login</button>
+  </div>
+
+  <script>
+    const form = document.getElementById("signUpForm");
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const messageDiv = document.getElementById("message");
+    const loginBtn = document.getElementById("loginBtn");
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      messageDiv.textContent = "";
+      messageDiv.style.color = "red";
+
+      const username = usernameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      // Basic client-side password validation example (optional)
+      const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+      if(password.length < 6 || !specialCharRegex.test(password)) {
+        messageDiv.textContent = "Password must be at least 6 characters and include a special character.";
+        return;
+      }
+
+      const data = { username, email, password };
+
+      try {
+        const res = await fetch("https://movie-listing-app-au97.onrender.com/signIn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (res.status === 201) {
+          messageDiv.style.color = "green";
+          messageDiv.textContent = "User created successfully! Redirecting to login...";
+          form.reset();
+
+          // Redirect to login page after 2 seconds
+          setTimeout(() => {
+            window.location.href = "pages/login.html";  // change to your actual login page URL
+          }, 2000);
+        } else {
+          messageDiv.style.color = "red";
+          messageDiv.textContent = result.message || "Signup failed.";
+        }
+      } catch (err) {
+        console.error(err);
+        messageDiv.style.color = "red";
+        messageDiv.textContent = "Server error. Please try again.";
+      }
+    });
+
+    loginBtn.addEventListener("click", () => {
+      window.location.href = "pages/login.html";  // change to your actual login page URL
+    });
+  </script>
+
+</body>
+</html>
