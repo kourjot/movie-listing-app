@@ -152,7 +152,7 @@
 
       const formData = new FormData(form);
 
-      const authToken = localStorage.getItem("token") || "YOUR_HARDCODED_TOKEN_HERE";
+      const authToken = localStorage.getItem("token") || "Dummy Token";
 
       try {
         const res = await fetch("https://movie-listing-app-au97.onrender.com/addMovie", {
