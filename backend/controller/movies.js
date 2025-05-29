@@ -14,7 +14,7 @@ export const addMovie=async(req,res)=>{
     try{
       let url;
       if (req.file) {
-              // Upload the new photo to Cloudinary if provided
+              
               const uploadResponse = await v2.uploader.upload(req.file.path);
               url = uploadResponse.secure_url;
               fs.unlinkSync(req.file.path)
@@ -27,13 +27,13 @@ export const addMovie=async(req,res)=>{
         await newMovie.save()
         res.status(201).json({message:"new movie is uploaded sucessfully"})
     }catch(err){
-      // console.log(err);
+      
         return res.status(500).json({message:"error in adding movies"})
     }
 }
 
 export const allMovies=async(req,res)=>{
-  // console.log(req.header.authorization);
+  
   try{
     const allMovies=await movie.find()
     res.status(200).json({message:allMovies})
